@@ -8,10 +8,10 @@
 </head>
 <body>
     <div>
-        <input type="file" name="" id="file-input">
+        <input type="file" name="" id="file-input" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
         <button id="download">生成 vcf文件</button>
     </div>
-    <script type="text/javascript" src="./xlsx-populate.min.js" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></script>
+    <script type="text/javascript" src="./xlsx-populate.min.js" ></script>
     <script type="text/javascript">
        function getWorkbook() { 
          var fileInput = document.getElementById("file-input")
