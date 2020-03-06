@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>excel表格转换通讯录vcf</title>
+</head>
+<body>
+    <div>
+        <input type="file" name="" id="file-input">
+        <button id="download">生成 vcf文件</button>
+    </div>
+    <script type="text/javascript" src="./xlsx-populate.min.js" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></script>
+    <script type="text/javascript">
+       function getWorkbook() { 
+         var fileInput = document.getElementById("file-input")
+         var file = fileInput.files[0]
+         if (!file) return Promise.reject("请选择文件！")
+            return XlsxPopulate.fromDataAsync(file)
+        }
+
+        function generate(type) {
+         return getWorkbook()
+            .then(function (workbook) {
+                workbook.sheet(0).cell("A1").value("This was created in the browser!").style("fontColor", "ff0000");
+                const values = workbook.sheet("Sheet1").usedRange().value();
+                var vcfData = values.map(e => {
+                    return `BEGIN:VCARD\nFN: ${e[0]}\nN: ${e[0]}\nTEL;CELL: ${e[1]}\nEND:VCARD\n`
+                }).join('\n')
+                console.log(values)
+                return vcfData
+            })
+        }
+        
+        var funDownload = function (content, filename) {
+            // 创建隐藏的可下载链接
+            var eleLink = document.createElement('a');
+            eleLink.download = filename;
+            eleLink.style.display = 'none';
+            // 字符内容转变成blob地址
+            var blob = new Blob([content]);
+            eleLink.href = URL.createObjectURL(blob);
+            // 触发点击
+            document.body.appendChild(eleLink);
+            eleLink.click();
+            // 然后移除
+            document.body.removeChild(eleLink);
+        }
+        var button = document.getElementById("download")
+         button.addEventListener('click', function (){
+            generate().then(function (data){
+                funDownload(data, 'num.vcf')
+            })
+            .catch(function (err) {
+                alert(err.message || err);
+                throw err;
+            });
+        })
+        // function generateBlob() {
+        // return generate()
+        //     .then(function (blob) {
+        //         if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+        //             window.navigator.msSaveOrOpenBlob(blob, "out.vcf");
+        //         } else {
+        //             var url = window.URL.createObjectURL(blob);
+        //             var a = document.createElement("a");
+        //             document.body.appendChild(a);
+        //             a.href = url;
+        //             a.download = "out.vcf";
+        //             a.click();
+        //             window.URL.revokeObjectURL(url);
+        //             document.body.removeChild(a);
+        //         }
+        //     })
+        //     .catch(function (err) {
+        //         alert(err.message || err);
+        //         throw err;
+        //     });
+        // }
+    </script>
+</body>
+</html>
